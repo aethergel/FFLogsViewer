@@ -298,6 +298,14 @@ public class FFLogsClient
         return query.ToString();
     }
 
+    private static IEnumerable<(int ZoneId, int DifficultyId, bool IsForcingADPS)> GetZoneInfo()
+    {
+        return Service.Configuration.Layout
+                .Where(entry => entry.Type == LayoutEntryType.Encounter)
+                .GroupBy(entry => new { entry.ZoneId, entry.DifficultyId })
+                .Select(group => (group.Key.ZoneId, group.Key.DifficultyId, IsForcingADPS: group.Any(entry => entry.IsForcingADPS)));
+    }
+
     private async Task<Token?> FetchToken()
     {
         var client = new HttpClient();
@@ -335,14 +343,6 @@ public class FFLogsClient
         }
 
         return null;
-    }
-
-    private static IEnumerable<(int ZoneId, int DifficultyId, bool IsForcingADPS)> GetZoneInfo()
-    {
-        return Service.Configuration.Layout
-                .Where(entry => entry.Type == LayoutEntryType.Encounter)
-                .GroupBy(entry => new { entry.ZoneId, entry.DifficultyId })
-                .Select(group => (group.Key.ZoneId, group.Key.DifficultyId, IsForcingADPS: group.Any(entry => entry.IsForcingADPS)));
     }
 
     private void CheckCache()
