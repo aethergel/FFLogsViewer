@@ -85,7 +85,7 @@ public class FFLogsClient
         {
             var token = await FetchToken().ConfigureAwait(false);
 
-            if (token is { Error: null })
+            if (token is { Error: null, AccessToken: not null })
             {
                 this.httpClient.DefaultRequestHeaders.Authorization
                     = new AuthenticationHeaderValue("Bearer", token.AccessToken);
@@ -111,16 +111,27 @@ public class FFLogsClient
         const string query = """{"query":"{worldData {expansions {name id zones {name id difficulties {name id} encounters {name id}}}}}"}""";
 
         var content = new StringContent(query, Encoding.UTF8, "application/json");
+        string? jsonContent = null;
 
         try
         {
             var dataResponse = await this.httpClient.PostAsync(baseAddress, content);
-            var jsonContent = await dataResponse.Content.ReadAsStringAsync();
-            Service.GameDataManager.SetDataFromJson(jsonContent);
+            if (dataResponse.IsSuccessStatusCode)
+            {
+                jsonContent = await dataResponse.Content.ReadAsStringAsync();
+                Service.GameDataManager.SetDataFromJson(jsonContent);
+            }
+            else
+            {
+                Service.PluginLog.Error($"Failure status code while fetching game data: {dataResponse.StatusCode} ({(uint)dataResponse.StatusCode})");
+            }
         }
         catch (Exception ex)
         {
             Service.PluginLog.Error(ex, "Error while fetching game data.");
+            Service.PluginLog.Error(jsonContent != null
+                                        ? $"Json content from request: {jsonContent}"
+                                        : "Json content from request was not set.");
         }
     }
 
@@ -137,6 +148,7 @@ public class FFLogsClient
         const string baseAddress = "https://www.fflogs.com/api/v2/client";
 
         var query = BuildQuery(charData);
+        string? jsonContent = null;
 
         try
         {
@@ -153,12 +165,19 @@ public class FFLogsClient
             {
                 var content = new StringContent(query, Encoding.UTF8, "application/json");
                 var dataResponse = await this.httpClient.PostAsync(baseAddress, content);
-                var jsonContent = await dataResponse.Content.ReadAsStringAsync();
-                deserializeJson = JsonConvert.DeserializeObject(jsonContent);
-
-                if (isCaching)
+                if (dataResponse.IsSuccessStatusCode)
                 {
-                    this.cache.TryAdd(query, deserializeJson);
+                    jsonContent = await dataResponse.Content.ReadAsStringAsync();
+                    deserializeJson = JsonConvert.DeserializeObject(jsonContent);
+
+                    if (isCaching)
+                    {
+                        this.cache.TryAdd(query, deserializeJson);
+                    }
+                }
+                else
+                {
+                    Service.PluginLog.Error($"Failure status code while fetching data: {dataResponse.StatusCode} ({(uint)dataResponse.StatusCode})");
                 }
             }
 
@@ -167,6 +186,9 @@ public class FFLogsClient
         catch (Exception ex)
         {
             Service.PluginLog.Error(ex, "Error while fetching data.");
+            Service.PluginLog.Error(jsonContent != null
+                                        ? $"Json content from request: {jsonContent}"
+                                        : "Json content from request was not set.");
             return null;
         }
     }
@@ -288,15 +310,25 @@ public class FFLogsClient
             { "client_secret", Service.Configuration.ClientSecret },
         };
 
+        string? jsonContent = null;
+
         try
         {
             var tokenResponse = await client.PostAsync(baseAddress, new FormUrlEncodedContent(form));
-            var jsonContent = await tokenResponse.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<Token>(jsonContent);
+            if (tokenResponse.IsSuccessStatusCode)
+            {
+                jsonContent = await tokenResponse.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<Token>(jsonContent);
+            }
+
+            Service.PluginLog.Error($"Failure status code while fetching token: {tokenResponse.StatusCode} ({(uint)tokenResponse.StatusCode})");
         }
         catch (Exception ex)
         {
             Service.PluginLog.Error(ex, "Error while fetching token.");
+            Service.PluginLog.Error(jsonContent != null
+                                        ? $"Json content from request: {jsonContent}"
+                                        : "Json content from request was not set.");
         }
 
         return null;
@@ -341,16 +373,25 @@ public class FFLogsClient
         const string query = """{"query":"{rateLimitData {limitPerHour}}"}""";
 
         var content = new StringContent(query, Encoding.UTF8, "application/json");
+        string? jsonContent = null;
 
         try
         {
             var dataResponse = await this.httpClient.PostAsync(baseAddress, content);
-            var jsonContent = await dataResponse.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<JObject>(jsonContent);
+            if (dataResponse.IsSuccessStatusCode)
+            {
+                jsonContent = await dataResponse.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<JObject>(jsonContent);
+            }
+
+            Service.PluginLog.Error($"Failure status code while fetching rate limit data: {dataResponse.StatusCode} ({(uint)dataResponse.StatusCode})");
         }
         catch (Exception ex)
         {
             Service.PluginLog.Error(ex, "Error while fetching rate limit data.");
+            Service.PluginLog.Error(jsonContent != null
+                                        ? $"Json content from request: {jsonContent}"
+                                        : "Json content from request was not set.");
         }
 
         return null;
