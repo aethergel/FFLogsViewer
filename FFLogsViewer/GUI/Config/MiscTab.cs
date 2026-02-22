@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Net;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Colors;
 using Dalamud.Interface.ImGuiNotification;
@@ -141,25 +141,31 @@ public class MiscTab
         {
             ImGui.TextColored(ImGuiColors.HealerGreen, "This client is valid.");
         }
+        else if (Service.FFLogsClient.LastTokenStatusCode == HttpStatusCode.Unauthorized)
+        {
+            ImGui.TextColored(ImGuiColors.DalamudRed, "This client is NOT valid (Unauthorized).");
+        }
+        else if ((int)Service.FFLogsClient.LastTokenStatusCode < 200 || (int)Service.FFLogsClient.LastTokenStatusCode > 299)
+        {
+            ImGui.TextColored(ImGuiColors.DalamudRed, $"Could not reach FF Logs servers, status code: {Service.FFLogsClient.LastTokenStatusCode} ({(int)Service.FFLogsClient.LastTokenStatusCode}).");
+
+            using var color = ImRaii.PushColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
+            ImGui.TextWrapped("This may indicate that FF Logs is down.\nMake sure you can open it in your browser before trying again.");
+            color.Pop();
+            if (ImGui.Button("Open FF Logs"))
+            {
+                Util.OpenLink("https://www.fflogs.com/");
+            }
+
+            ImGui.SameLine();
+            if (ImGui.Button("Try again"))
+            {
+                Service.FFLogsClient.SetToken();
+            }
+        }
         else
         {
             ImGui.TextColored(ImGuiColors.DalamudRed, "This client is NOT valid.");
-            if (FFLogsClient.IsConfigSet())
-            {
-                using var color = ImRaii.PushColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
-                ImGui.TextWrapped("If you are certain that the API client is valid, this may indicate that FF Logs is unreachable.\nMake sure you can open it in your browser before trying again.");
-                color.Pop();
-                if (ImGui.Button("Open FF Logs"))
-                {
-                    Util.OpenLink("https://www.fflogs.com/");
-                }
-
-                ImGui.SameLine();
-                if (ImGui.Button("Try again"))
-                {
-                    Service.FFLogsClient.SetToken();
-                }
-            }
         }
 
         if (ImGui.CollapsingHeader("How to get a client ID and a client secret:"))

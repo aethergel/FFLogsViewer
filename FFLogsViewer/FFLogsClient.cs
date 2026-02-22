@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -17,11 +18,12 @@ namespace FFLogsViewer;
 public class FFLogsClient
 {
     public volatile bool IsTokenValid;
+    public HttpStatusCode LastTokenStatusCode = HttpStatusCode.OK;
     public int LimitPerHour;
     public bool HasLimitPerHourFailed => this.rateLimitDataFetchAttempts >= 3;
 
     private readonly HttpClient httpClient;
-    private readonly object lastCacheRefreshLock = new();
+    private readonly Lock lastCacheRefreshLock = new();
     private readonly ConcurrentDictionary<string, dynamic?> cache = new();
     private volatile bool isRateLimitDataLoading;
     private volatile int rateLimitDataFetchAttempts = 5;
@@ -83,7 +85,7 @@ public class FFLogsClient
 
         Task.Run(async () =>
         {
-            var token = await FetchToken().ConfigureAwait(false);
+            var token = await this.FetchToken().ConfigureAwait(false);
 
             if (token is { Error: null, AccessToken: not null })
             {
@@ -123,7 +125,7 @@ public class FFLogsClient
             }
             else
             {
-                Service.PluginLog.Error($"Failure status code while fetching game data: {dataResponse.StatusCode} ({(uint)dataResponse.StatusCode})");
+                Service.PluginLog.Error($"Failure status code while fetching game data: {dataResponse.StatusCode} ({(int)dataResponse.StatusCode})");
             }
         }
         catch (Exception ex)
@@ -177,7 +179,7 @@ public class FFLogsClient
                 }
                 else
                 {
-                    Service.PluginLog.Error($"Failure status code while fetching data: {dataResponse.StatusCode} ({(uint)dataResponse.StatusCode})");
+                    Service.PluginLog.Error($"Failure status code while fetching data: {dataResponse.StatusCode} ({(int)dataResponse.StatusCode})");
                 }
             }
 
@@ -296,7 +298,7 @@ public class FFLogsClient
         return query.ToString();
     }
 
-    private static async Task<Token?> FetchToken()
+    private async Task<Token?> FetchToken()
     {
         var client = new HttpClient();
 
@@ -315,13 +317,14 @@ public class FFLogsClient
         try
         {
             var tokenResponse = await client.PostAsync(baseAddress, new FormUrlEncodedContent(form));
+            this.LastTokenStatusCode = tokenResponse.StatusCode;
             if (tokenResponse.IsSuccessStatusCode)
             {
                 jsonContent = await tokenResponse.Content.ReadAsStringAsync();
                 return JsonConvert.DeserializeObject<Token>(jsonContent);
             }
 
-            Service.PluginLog.Error($"Failure status code while fetching token: {tokenResponse.StatusCode} ({(uint)tokenResponse.StatusCode})");
+            Service.PluginLog.Error($"Failure status code while fetching token: {tokenResponse.StatusCode} ({(int)tokenResponse.StatusCode})");
         }
         catch (Exception ex)
         {
@@ -384,7 +387,7 @@ public class FFLogsClient
                 return JsonConvert.DeserializeObject<JObject>(jsonContent);
             }
 
-            Service.PluginLog.Error($"Failure status code while fetching rate limit data: {dataResponse.StatusCode} ({(uint)dataResponse.StatusCode})");
+            Service.PluginLog.Error($"Failure status code while fetching rate limit data: {dataResponse.StatusCode} ({(int)dataResponse.StatusCode})");
         }
         catch (Exception ex)
         {
