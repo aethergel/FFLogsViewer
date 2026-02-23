@@ -76,6 +76,7 @@ public class FFLogsClient
     public void SetToken()
     {
         this.IsTokenValid = false;
+        this.LastTokenStatusCode = HttpStatusCode.OK;
         this.rateLimitDataFetchAttempts = 0;
 
         if (!IsConfigSet())
