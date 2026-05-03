@@ -1,7 +1,9 @@
 # FFLogsViewer
 Small plugin to view FFLogs ranking percentiles in-game using Dalamud provided by [XIVLauncher](https://github.com/goatcorp/FFXIVQuickLauncher).
 
-To install, see instructions on [my repo](https://github.com/Aireil/MyDalamudPlugins) (global client).\
+To install, see instructions on [my repo](https://github.com/Aireil/MyDalamudPlugins) (global + CN version).\
+这个版本现在也支持国服了。\
+Thank you to [Nukoooo](https://github.com/Nukoooo) for having supported the CN version between 2022 and 2026.
 
 For commands, look in the installer.
 
