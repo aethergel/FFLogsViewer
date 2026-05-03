@@ -199,12 +199,12 @@ public class Util
 
     public static void OpenFFLogsLink(CharData charData)
     {
-        OpenLink($"https://fflogs.com/character/{CharDataManager.GetRegionCode(charData.WorldName)}/{charData.WorldName}/{charData.FirstName} {charData.LastName}");
+        OpenLink($"https://fflogs.com/character/{CharDataManager.GetRegionCode(charData.WorldName)}/{charData.WorldName}/{charData.FullName}");
     }
 
     public static void OpenTomestoneLink(CharData charData)
     {
-        OpenLink($"https://tomestone.gg/character-name/{charData.WorldName}/{charData.FirstName} {charData.LastName}");
+        OpenLink($"https://tomestone.gg/character-name/{charData.WorldName}/{charData.FullName}");
     }
 
     public static void OpenLink(string link)
@@ -214,7 +214,8 @@ public class Util
 
     public static void LinkOpenOrPopup(CharData charData)
     {
-        if (!ImGui.BeginPopupContextItem($"##LinkPopup{charData.FirstName}{charData.LastName}{charData.WorldName}{charData.GetHashCode()}", ImGuiPopupFlags.MouseButtonLeft))
+        if (!ImGui.BeginPopupContextItem($"##LinkPopup{charData.FullName}{charData.WorldName}{charData.GetHashCode()}",
+                                         ImGuiPopupFlags.MouseButtonLeft))
         {
             return;
         }
@@ -262,20 +263,20 @@ public class Util
         return charData.CharError switch
         {
             CharacterError.CharacterNotFoundFFLogs => "Character not found on FF Logs",
-            CharacterError.CharacterNotFound => "Character not found",
-            CharacterError.ClipboardError => "Couldn't get clipboard text",
-            CharacterError.GenericError => "An error occured, please try again",
-            CharacterError.HiddenLogs => $"{charData.FirstName} {charData.LastName}@{charData.WorldName}'s logs are hidden",
-            CharacterError.InvalidTarget => "Not a valid target",
-            CharacterError.InvalidWorld => "World not supported or invalid",
-            CharacterError.MalformedQuery => "Malformed GraphQL query.",
-            CharacterError.MissingInputs => "Please fill first name, last name, and world",
-            CharacterError.NetworkError => "Network error",
-            CharacterError.OutOfPoints => "Ran out of API points, see Layout tab in config for more info.",
-            CharacterError.Unauthenticated => "API Client not valid, check config",
-            CharacterError.Unreachable => "Could not reach FF Logs servers",
-            CharacterError.WorldNotFound => "World not found",
-            _ => "If you see this, something went wrong",
+            CharacterError.CharacterNotFound       => "Character not found",
+            CharacterError.ClipboardError          => "Couldn't get clipboard text",
+            CharacterError.GenericError            => "An error occured, please try again",
+            CharacterError.HiddenLogs              => $"{charData.FullName}@{charData.WorldName}'s logs are hidden",
+            CharacterError.InvalidTarget           => "Not a valid target",
+            CharacterError.InvalidWorld            => "World not supported or invalid",
+            CharacterError.MalformedQuery          => "Malformed GraphQL query.",
+            CharacterError.MissingInputs           => "Please fill first name, last name, and world",
+            CharacterError.NetworkError            => "Network error",
+            CharacterError.OutOfPoints             => "Ran out of API points, see Layout tab in config for more info.",
+            CharacterError.Unauthenticated         => "API Client not valid, check config",
+            CharacterError.Unreachable             => "Could not reach FF Logs servers",
+            CharacterError.WorldNotFound           => "World not found",
+            _                                      => "If you see this, something went wrong",
         };
     }
 
@@ -333,7 +334,10 @@ public class Util
             return false;
         }
 
-        return char.IsUpper(world.Name.ToString()[0]);
+        if (GetRegionId(world) < 5)
+            return char.IsUpper(world.Name.ToString()[0]);
+
+        return true;
     }
 
     public static World GetWorld(uint worldId)
@@ -347,6 +351,9 @@ public class Util
         return world;
     }
 
+    public static uint GetRegionId(World world)
+        => world.DataCenter.ValueNullable?.Region.RowId ?? 0;
+
     public static string GetRegionCode(World world)
     {
         return world.DataCenter.ValueNullable?.Region.RowId switch
@@ -355,6 +362,7 @@ public class Util
             2 => "na",
             3 => "eu",
             4 => "oc",
+            5 => "cn",
             _ => string.Empty,
         };
     }

@@ -122,7 +122,7 @@ public class HeaderBar
             {
                 if (Service.CharDataManager.DisplayedChar.IsDataReady)
                 {
-                    Util.CenterSelectable($"Viewing {Service.CharDataManager.DisplayedChar.LoadedFirstName} {Service.CharDataManager.DisplayedChar.LoadedLastName}@{Service.CharDataManager.DisplayedChar.LoadedWorldName}'s logs");
+                    Util.CenterSelectable($"Viewing {Service.CharDataManager.DisplayedChar.LoadedFullName}@{Service.CharDataManager.DisplayedChar.LoadedWorldName}'s logs");
                     Util.LinkOpenOrPopup(Service.CharDataManager.DisplayedChar);
 
                     Util.SetHoverTooltip($"Click to open on {(Service.Configuration.ShowTomestoneOption ? "..." : "FF Logs")}");
@@ -227,7 +227,7 @@ public class HeaderBar
 
                     if (ImGui.Selectable($"##PartyListSel{i}", false, ImGuiSelectableFlags.SpanAllColumns, new Vector2(0, iconSize)))
                     {
-                        Service.CharDataManager.DisplayedChar.FetchCharacter($"{partyMember.FirstName} {partyMember.LastName}@{partyMember.World}");
+                        Service.CharDataManager.DisplayedChar.FetchCharacter($"{partyMember.FullName}@{partyMember.World}");
                     }
 
                     ImGui.SameLine();
@@ -236,7 +236,7 @@ public class HeaderBar
                     ImGui.TableNextColumn();
 
                     ImGui.SetCursorPosY(middleCursorPosY);
-                    ImGui.Text($"{partyMember.FirstName} {partyMember.LastName}");
+                    ImGui.Text(partyMember.FullName);
 
                     ImGui.TableNextColumn();
 

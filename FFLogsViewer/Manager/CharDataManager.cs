@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FFLogsViewer.Model;
@@ -42,8 +42,8 @@ public class CharDataManager
 
         if (!Service.Configuration.Style.IsLocalPlayerInPartyView && !this.IsCurrPartyAnAlliance)
         {
-            var index = currPartyMembers.FindIndex(member => $"{member.FirstName} {member.LastName}" == localPLayer?.CharacterName
-                                                             && member.World == localPLayer.HomeWorld.ValueNullable?.Name);
+            var index = currPartyMembers.FindIndex(member => member.FullName == localPLayer?.CharacterName
+                                                              && member.World == localPLayer.HomeWorld.ValueNullable?.Name);
             if (index >= 0)
             {
                 currPartyMembers.RemoveAt(index);

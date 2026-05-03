@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
@@ -17,28 +16,53 @@ public class CharData
 {
     public Metric? LoadedMetric;
     public CharacterError? CharError;
+
     public string FirstName = string.Empty;
-    public string LastName = string.Empty;
-    public string WorldName = string.Empty;
+    public string LastName  = string.Empty;
+
+    public string WorldName  = string.Empty;
     public string RegionName = string.Empty;
-    public string LoadedFirstName = string.Empty;
-    public string LoadedLastName = string.Empty;
+
+    public string LoadedFullName  = string.Empty;
     public string LoadedWorldName = string.Empty;
+
     public uint JobId;
     public uint LoadedJobId;
+
     public volatile bool IsDataLoading;
     public volatile bool IsDataReady;
+
+    public string FullName
+    {
+        get
+        {
+            if (this.FirstName == string.Empty)
+            {
+                return string.Empty;
+            }
+
+            return this.LastName != string.Empty ? $"{this.FirstName} {this.LastName}" : this.FirstName;
+        }
+    }
+
+    public bool IsSingleName => this.LastName == string.Empty;
 
     public string Abbreviation
     {
         get
         {
-            if (this.FirstName == string.Empty || this.LastName == string.Empty)
+            if (this.FirstName == string.Empty)
             {
                 return "-";
             }
 
-            return $"{this.FirstName[0]}. {this.LastName[0]}.";
+            if (this.LastName != string.Empty)
+            {
+                return $"{this.FirstName[0]}. {this.LastName[0]}.";
+            }
+
+            // Single-name (CN/KR): use first character + period
+            return $"{this.FirstName[0]}.";
         }
     }
 
@@ -83,16 +107,18 @@ public class CharData
             return false;
         }
 
-        this.FirstName = playerCharacter.Name.TextValue.Split(' ')[0];
-        this.LastName = playerCharacter.Name.TextValue.Split(' ')[1];
+        var nameParts = playerCharacter.Name.TextValue.Split(' ');
+        this.FirstName = nameParts[0];
+
+        // Check if a last name exists
+        this.LastName = nameParts.Length > 1 ? nameParts[1] : string.Empty;
+
         this.WorldName = playerCharacter.HomeWorld.Value.Name.ToString();
         return true;
     }
 
     public bool IsInfoSet()
-    {
-        return this.FirstName != string.Empty && this.LastName != string.Empty && this.WorldName != string.Empty;
-    }
+        => this.FirstName != string.Empty && this.WorldName != string.Empty;
 
     public void FetchTargetChar()
     {
@@ -126,6 +152,8 @@ public class CharData
         }
 
         var regionName = CharDataManager.GetRegionCode(this.WorldName);
+        Service.PluginLog.Info($"RegionName: {regionName}");
+
         if (regionName == string.Empty)
         {
             this.CharError = CharacterError.InvalidWorld;
@@ -211,9 +239,8 @@ public class CharData
                 }
             }
 
-            this.IsDataReady = true;
-            this.LoadedFirstName = this.FirstName;
-            this.LoadedLastName = this.LastName;
+            this.IsDataReady     = true;
+            this.LoadedFullName       = this.FullName;
             this.LoadedWorldName = this.WorldName;
             if (Service.MainWindow.Job.Name != "All jobs")
             {
@@ -252,13 +279,14 @@ public class CharData
         rawText = rawText.Replace("'s party for", " ");
         rawText = rawText.Replace("You join", " ");
         rawText = Regex.Replace(rawText, @"\[.*?\]", " ");
-        rawText = Regex.Replace(rawText, "[^A-Za-z '-]", " ");
+        rawText = Regex.Replace(rawText, @"[^\p{L} '-]", " ");
         rawText = string.Concat(rawText.Select(x => char.IsUpper(x) ? " " + x : x.ToString())).TrimStart(' ');
         rawText = Regex.Replace(rawText, @"\s+", " ");
 
         var words = rawText.Split([" "], StringSplitOptions.RemoveEmptyEntries);
 
         var worldIndex = -1;
+
         if (words.Length > 2)
         {
             for (var i = 0; worldIndex == -1 && i < Service.CharDataManager.ValidWorlds.Length; i++)
@@ -267,11 +295,27 @@ public class CharData
                 worldIndex = Array.IndexOf(words, Service.CharDataManager.ValidWorlds[i], 2);
             }
         }
+        else if (words.Length >= 1)
+        {
+            // also search from index 0 for shorter text (single-name regions)
+            for (var i = 0; worldIndex == -1 && i < Service.CharDataManager.ValidWorlds.Length; i++)
+            {
+                worldIndex = Array.IndexOf(words, Service.CharDataManager.ValidWorlds[i], 0);
+            }
+        }
 
         if (worldIndex - 2 >= 0)
         {
+            // Global format: FirstName LastName WorldName
             character.FirstName = words[worldIndex - 2];
-            character.LastName = words[worldIndex - 1];
+            character.LastName  = words[worldIndex - 1];
+            character.WorldName = words[worldIndex];
+        }
+        else if (worldIndex - 1 >= 0)
+        {
+            // Single-name format (CN/KR): PlayerName WorldName
+            character.FirstName = words[worldIndex - 1];
+            character.LastName  = string.Empty;
             character.WorldName = words[worldIndex];
         }
         else if (words.Length >= 2)
@@ -282,7 +326,19 @@ public class CharData
             }
 
             character.FirstName = words[0];
-            character.LastName = words[1];
+            character.LastName  = words[1];
+            character.WorldName = Service.PlayerState.HomeWorld.Value.Name.ToString();
+        }
+        else if (words.Length == 1)
+        {
+            // Single-name fallback: one word with player's home world
+            if (Service.PlayerState.HomeWorld.ValueNullable == null)
+            {
+                return false;
+            }
+
+            character.FirstName = words[0];
+            character.LastName  = string.Empty;
             character.WorldName = Service.PlayerState.HomeWorld.Value.Name.ToString();
         }
         else
@@ -290,7 +346,12 @@ public class CharData
             return false;
         }
 
-        if (!char.IsUpper(character.FirstName[0]) || !char.IsUpper(character.LastName[0]))
+        if (!IsValidNameFirstChar(character.FirstName[0]))
+        {
+            return false;
+        }
+
+        if (!character.IsSingleName && !IsValidNameFirstChar(character.LastName[0]))
         {
             return false;
         }
@@ -301,6 +362,9 @@ public class CharData
 
         return true;
     }
+
+    private static bool IsValidNameFirstChar(char c)
+        => char.IsLetter(c) && char.IsUpper(c);
 
     public void FetchClipboardCharacter()
     {
@@ -365,7 +429,8 @@ public class CharData
         }
 
         // search in the object table first as it updates faster and is always accurate
-        var fullName = $"{this.FirstName} {this.LastName}";
+        var fullName = this.FullName;
+
         for (var i = 0; i < 200; i += 2)
         {
             var obj = Service.ObjectTable[i];

@@ -1,13 +1,11 @@
-﻿using System;
+using System;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using Dalamud.Game.ClientState.Keys;
 using Dalamud.Hooking;
-using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Info;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFLogsViewer.Manager;
 
@@ -250,7 +248,7 @@ public unsafe class OpenWithManager
             if (Service.Configuration.OpenWith.IsPartyFinderEnabled)
             {
                 var hasFailed = data->LastPatchHotfixTimestamp == 0; // previously 92/0x5C was checked, but that's not documented in CS yet. this works as a replacement.
-                var isPrivate = data->JoinConditionFlags.HasFlag(AgentLookingForGroup.JoinCondition.PrivateParty);
+                var isPrivate = data->JoinConditionFlags.HasFlag(AgentLookingForGroup.JoinCondition.Private);
                 var isJoining = this.isJoiningPartyFinderOffset != 0 && *(byte*)(agent + this.isJoiningPartyFinderOffset) != 0;
 
                 if (!hasFailed && !isPrivate && !isJoining)

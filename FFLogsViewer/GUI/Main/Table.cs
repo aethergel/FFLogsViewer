@@ -360,7 +360,7 @@ public class Table
 
                     if (charData.CharError == null)
                     {
-                        Util.SetHoverTooltip($"{charData.FirstName} {charData.LastName}@{charData.WorldName}");
+                        Util.SetHoverTooltip($"{charData.FullName}@{charData.WorldName}");
                     }
                 }
                 else
@@ -609,14 +609,14 @@ public class Table
                     }
 
                     using var color = ImRaii.PushColor(ImGuiCol.Text, jobColor);
-                    Util.SelectableWithError($"{charData.FirstName} {charData.LastName}##Selectable{i}", charData);
+                    Util.SelectableWithError($"{charData.FullName}##Selectable{i}", charData);
                     Util.LinkOpenOrPopup(charData);
 
                     color.Pop();
 
                     if (charData.CharError == null)
                     {
-                        Util.SetHoverTooltip($"{charData.FirstName} {charData.LastName}@{charData.WorldName}");
+                        Util.SetHoverTooltip($"{charData.FullName}@{charData.WorldName}");
                     }
                 }
                 else

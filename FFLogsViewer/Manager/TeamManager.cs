@@ -198,11 +198,15 @@ public class TeamManager
         }
 
         var splitName = fullName.Split(' ');
-        if (splitName.Length != 2)
+        if (splitName.Length >= 2)
         {
-            return;
+            // Global format: FirstName LastName
+            this.TeamList.Add(new TeamMember { FirstName = splitName[0], LastName = splitName[1], World = world.Name.ToString(), JobId = jobId, AllianceIndex = groupIndex });
         }
-
-        this.TeamList.Add(new TeamMember { FirstName = splitName[0], LastName = splitName[1], World = world.Name.ToString(), JobId = jobId, AllianceIndex = groupIndex });
+        else
+        {
+            // Single-name format (CN/KR)
+            this.TeamList.Add(new TeamMember { FirstName = splitName[0], LastName = string.Empty, World = world.Name.ToString(), JobId = jobId, AllianceIndex = groupIndex });
+        }
     }
 }
