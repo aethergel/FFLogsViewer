@@ -45,8 +45,6 @@ public class CharData
         }
     }
 
-    public bool IsSingleName => this.LastName == string.Empty;
-
     public string Abbreviation
     {
         get
@@ -61,7 +59,7 @@ public class CharData
                 return $"{this.FirstName[0]}. {this.LastName[0]}.";
             }
 
-            // Single-name (CN/KR): use first character + period
+            // Single-name (CN): use first character + period
             return $"{this.FirstName[0]}.";
         }
     }
@@ -110,7 +108,7 @@ public class CharData
         var nameParts = playerCharacter.Name.TextValue.Split(' ');
         this.FirstName = nameParts[0];
 
-        // Check if a last name exists
+        // Check if a last name exists (global vs cn)
         this.LastName = nameParts.Length > 1 ? nameParts[1] : string.Empty;
 
         this.WorldName = playerCharacter.HomeWorld.Value.Name.ToString();
@@ -118,7 +116,7 @@ public class CharData
     }
 
     public bool IsInfoSet()
-        => this.FirstName != string.Empty && this.WorldName != string.Empty;
+        => this.FirstName != string.Empty && (this.LastName != string.Empty || !Util.IsGlobalVersion()) && this.WorldName != string.Empty;
 
     public void FetchTargetChar()
     {
@@ -152,7 +150,6 @@ public class CharData
         }
 
         var regionName = CharDataManager.GetRegionCode(this.WorldName);
-        Service.PluginLog.Info($"RegionName: {regionName}");
 
         if (regionName == string.Empty)
         {
@@ -291,7 +288,7 @@ public class CharData
         {
             for (var i = 0; worldIndex == -1 && i < Service.CharDataManager.ValidWorlds.Length; i++)
             {
-                // starts at 2 to skip first and last name, which could be the same as their world (doesn't completely fix every cases)
+                // starts at 2 to skip first and last name, which could be the same as their world (doesn't completely fix every case)
                 worldIndex = Array.IndexOf(words, Service.CharDataManager.ValidWorlds[i], 2);
             }
         }
@@ -304,54 +301,51 @@ public class CharData
             }
         }
 
-        if (worldIndex - 2 >= 0)
+        if (Util.IsGlobalVersion())
         {
-            // Global format: FirstName LastName WorldName
-            character.FirstName = words[worldIndex - 2];
-            character.LastName = words[worldIndex - 1];
-            character.WorldName = words[worldIndex];
-        }
-        else if (worldIndex - 1 >= 0)
-        {
-            // Single-name format (CN/KR): PlayerName WorldName
-            character.FirstName = words[worldIndex - 1];
-            character.LastName = string.Empty;
-            character.WorldName = words[worldIndex];
-        }
-        else if (words.Length >= 2)
-        {
-            if (Service.PlayerState.HomeWorld.ValueNullable == null)
+            if (worldIndex >= 2)
+            {
+                // Global format: FirstName LastName WorldName
+                character.FirstName = words[worldIndex - 2];
+                character.LastName = words[worldIndex - 1];
+                character.WorldName = words[worldIndex];
+            }
+            else if (words.Length >= 2 && Service.PlayerState.HomeWorld.ValueNullable != null)
+            {
+                // Global fallback: FirstName LastName (Implied Home World)
+                character.FirstName = words[0];
+                character.LastName = words[1];
+                character.WorldName = Service.PlayerState.HomeWorld.Value.Name.ToString();
+            }
+            else
             {
                 return false;
             }
-
-            character.FirstName = words[0];
-            character.LastName = words[1];
-            character.WorldName = Service.PlayerState.HomeWorld.Value.Name.ToString();
-        }
-        else if (words.Length == 1)
-        {
-            // Single-name fallback: one word with player's home world
-            if (Service.PlayerState.HomeWorld.ValueNullable == null)
-            {
-                return false;
-            }
-
-            character.FirstName = words[0];
-            character.LastName = string.Empty;
-            character.WorldName = Service.PlayerState.HomeWorld.Value.Name.ToString();
         }
         else
         {
-            return false;
+            if (worldIndex >= 1)
+            {
+                // CN format: PlayerName WorldName
+                character.FirstName = words[worldIndex - 1];
+                character.LastName = string.Empty;
+                character.WorldName = words[worldIndex];
+            }
+            else if (words.Length == 1 && Service.PlayerState.HomeWorld.ValueNullable != null)
+            {
+                // CN fallback: PlayerName (Implied Home World)
+                character.FirstName = words[0];
+                character.LastName = string.Empty;
+                character.WorldName = Service.PlayerState.HomeWorld.Value.Name.ToString();
+            }
+            else
+            {
+                return false;
+            }
         }
 
-        if (!IsValidNameFirstChar(character.FirstName[0]))
-        {
-            return false;
-        }
-
-        if (!character.IsSingleName && !IsValidNameFirstChar(character.LastName[0]))
+        if (!IsValidNameFirstChar(character.FirstName[0])
+            || (Util.IsGlobalVersion() && !IsValidNameFirstChar(character.LastName[0])))
         {
             return false;
         }
@@ -429,13 +423,11 @@ public class CharData
         }
 
         // search in the object table first as it updates faster and is always accurate
-        var fullName = this.FullName;
-
         for (var i = 0; i < 200; i += 2)
         {
             var obj = Service.ObjectTable[i];
             if (obj is IPlayerCharacter playerCharacter
-                && playerCharacter.Name.TextValue == fullName
+                && playerCharacter.Name.TextValue == this.FullName
                 && playerCharacter.HomeWorld.ValueNullable?.Name == this.WorldName)
             {
                 this.JobId = playerCharacter.ClassJob.RowId;

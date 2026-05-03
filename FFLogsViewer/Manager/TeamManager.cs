@@ -198,6 +198,11 @@ public class TeamManager
         }
 
         var splitName = fullName.Split(' ');
+        if (splitName.Length != (Util.IsGlobalVersion() ? 2 : 1))
+        {
+            return;
+        }
+
         if (splitName.Length >= 2)
         {
             // Global format: FirstName LastName
@@ -205,7 +210,7 @@ public class TeamManager
         }
         else
         {
-            // Single-name format (CN/KR)
+            // Single-name format (CN)
             this.TeamList.Add(new TeamMember { FirstName = splitName[0], LastName = string.Empty, World = world.Name.ToString(), JobId = jobId, AllianceIndex = groupIndex });
         }
     }

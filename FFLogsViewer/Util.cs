@@ -221,7 +221,7 @@ public class Util
             return;
         }
 
-        if (!Service.Configuration.ShowTomestoneOption)
+        if (!Service.Configuration.ShowTomestoneOption || !IsGlobalVersion())
         {
             OpenFFLogsLink(charData);
             ImGui.CloseCurrentPopup();
@@ -335,7 +335,7 @@ public class Util
             return false;
         }
 
-        if (GetRegionId(world) < 5)
+        if (IsGlobalVersion())
             return char.IsUpper(world.Name.ToString()[0]);
 
         return true;
@@ -351,9 +351,6 @@ public class Util
 
         return world;
     }
-
-    public static uint GetRegionId(World world)
-        => world.DataCenter.ValueNullable?.Region.RowId ?? 0;
 
     public static string GetRegionCode(World world)
     {
@@ -410,5 +407,10 @@ public class Util
 
         result = default;
         return false;
+    }
+
+    public static bool IsGlobalVersion()
+    {
+        return (int)Service.ClientState.ClientLanguage <= 3;
     }
 }

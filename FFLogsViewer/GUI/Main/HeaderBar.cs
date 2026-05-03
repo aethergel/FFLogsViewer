@@ -125,7 +125,7 @@ public class HeaderBar
                     Util.CenterSelectable($"Viewing {Service.CharDataManager.DisplayedChar.LoadedFullName}@{Service.CharDataManager.DisplayedChar.LoadedWorldName}'s logs");
                     Util.LinkOpenOrPopup(Service.CharDataManager.DisplayedChar);
 
-                    Util.SetHoverTooltip($"Click to open on {(Service.Configuration.ShowTomestoneOption ? "..." : "FF Logs")}");
+                    Util.SetHoverTooltip($"Click to open on {(Service.Configuration.ShowTomestoneOption && Util.IsGlobalVersion() ? "..." : "FF Logs")}");
                 }
                 else
                 {
@@ -137,7 +137,7 @@ public class HeaderBar
         {
             if (Util.ShouldErrorBeClickable(Service.CharDataManager.DisplayedChar))
             {
-                Util.CenterSelectableError(Service.CharDataManager.DisplayedChar, $"Click to open on {(Service.Configuration.ShowTomestoneOption ? "..." : "FF Logs")}");
+                Util.CenterSelectableError(Service.CharDataManager.DisplayedChar, $"Click to open on {(Service.Configuration.ShowTomestoneOption && Util.IsGlobalVersion() ? "..." : "FF Logs")}");
                 Util.LinkOpenOrPopup(Service.CharDataManager.DisplayedChar);
             }
             else

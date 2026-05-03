@@ -102,11 +102,14 @@ public class MiscTab
 
         ImGui.EndDisabled();
 
-        var showTomestoneOption = Service.Configuration.ShowTomestoneOption;
-        if (ImGui.Checkbox("Show Tomestone option when opening a link", ref showTomestoneOption))
+        if (Util.IsGlobalVersion())
         {
-            Service.Configuration.ShowTomestoneOption = showTomestoneOption;
-            hasChanged = true;
+            var showTomestoneOption = Service.Configuration.ShowTomestoneOption;
+            if (ImGui.Checkbox("Show Tomestone option when opening a link", ref showTomestoneOption))
+            {
+                Service.Configuration.ShowTomestoneOption = showTomestoneOption;
+                hasChanged = true;
+            }
         }
 
         var isCachingEnabled = Service.Configuration.IsCachingEnabled;
