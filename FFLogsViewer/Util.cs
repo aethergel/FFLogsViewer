@@ -214,8 +214,9 @@ public class Util
 
     public static void LinkOpenOrPopup(CharData charData)
     {
-        if (!ImGui.BeginPopupContextItem($"##LinkPopup{charData.FullName}{charData.WorldName}{charData.GetHashCode()}",
-                                         ImGuiPopupFlags.MouseButtonLeft))
+        if (!ImGui.BeginPopupContextItem(
+                $"##LinkPopup{charData.FullName}{charData.WorldName}{charData.GetHashCode()}",
+                ImGuiPopupFlags.MouseButtonLeft))
         {
             return;
         }
@@ -263,20 +264,20 @@ public class Util
         return charData.CharError switch
         {
             CharacterError.CharacterNotFoundFFLogs => "Character not found on FF Logs",
-            CharacterError.CharacterNotFound       => "Character not found",
-            CharacterError.ClipboardError          => "Couldn't get clipboard text",
-            CharacterError.GenericError            => "An error occured, please try again",
-            CharacterError.HiddenLogs              => $"{charData.FullName}@{charData.WorldName}'s logs are hidden",
-            CharacterError.InvalidTarget           => "Not a valid target",
-            CharacterError.InvalidWorld            => "World not supported or invalid",
-            CharacterError.MalformedQuery          => "Malformed GraphQL query.",
-            CharacterError.MissingInputs           => "Please fill first name, last name, and world",
-            CharacterError.NetworkError            => "Network error",
-            CharacterError.OutOfPoints             => "Ran out of API points, see Layout tab in config for more info.",
-            CharacterError.Unauthenticated         => "API Client not valid, check config",
-            CharacterError.Unreachable             => "Could not reach FF Logs servers",
-            CharacterError.WorldNotFound           => "World not found",
-            _                                      => "If you see this, something went wrong",
+            CharacterError.CharacterNotFound => "Character not found",
+            CharacterError.ClipboardError => "Couldn't get clipboard text",
+            CharacterError.GenericError => "An error occured, please try again",
+            CharacterError.HiddenLogs => $"{charData.FullName}@{charData.WorldName}'s logs are hidden",
+            CharacterError.InvalidTarget => "Not a valid target",
+            CharacterError.InvalidWorld => "World not supported or invalid",
+            CharacterError.MalformedQuery => "Malformed GraphQL query.",
+            CharacterError.MissingInputs => "Please fill first name, last name, and world",
+            CharacterError.NetworkError => "Network error",
+            CharacterError.OutOfPoints => "Ran out of API points, see Layout tab in config for more info.",
+            CharacterError.Unauthenticated => "API Client not valid, check config",
+            CharacterError.Unreachable => "Could not reach FF Logs servers",
+            CharacterError.WorldNotFound => "World not found",
+            _ => "If you see this, something went wrong",
         };
     }
 

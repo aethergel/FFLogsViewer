@@ -18,12 +18,12 @@ public class CharData
     public CharacterError? CharError;
 
     public string FirstName = string.Empty;
-    public string LastName  = string.Empty;
+    public string LastName = string.Empty;
 
-    public string WorldName  = string.Empty;
+    public string WorldName = string.Empty;
     public string RegionName = string.Empty;
 
-    public string LoadedFullName  = string.Empty;
+    public string LoadedFullName = string.Empty;
     public string LoadedWorldName = string.Empty;
 
     public uint JobId;
@@ -239,8 +239,8 @@ public class CharData
                 }
             }
 
-            this.IsDataReady     = true;
-            this.LoadedFullName       = this.FullName;
+            this.IsDataReady = true;
+            this.LoadedFullName = this.FullName;
             this.LoadedWorldName = this.WorldName;
             if (Service.MainWindow.Job.Name != "All jobs")
             {
@@ -308,14 +308,14 @@ public class CharData
         {
             // Global format: FirstName LastName WorldName
             character.FirstName = words[worldIndex - 2];
-            character.LastName  = words[worldIndex - 1];
+            character.LastName = words[worldIndex - 1];
             character.WorldName = words[worldIndex];
         }
         else if (worldIndex - 1 >= 0)
         {
             // Single-name format (CN/KR): PlayerName WorldName
             character.FirstName = words[worldIndex - 1];
-            character.LastName  = string.Empty;
+            character.LastName = string.Empty;
             character.WorldName = words[worldIndex];
         }
         else if (words.Length >= 2)
@@ -326,7 +326,7 @@ public class CharData
             }
 
             character.FirstName = words[0];
-            character.LastName  = words[1];
+            character.LastName = words[1];
             character.WorldName = Service.PlayerState.HomeWorld.Value.Name.ToString();
         }
         else if (words.Length == 1)
@@ -338,7 +338,7 @@ public class CharData
             }
 
             character.FirstName = words[0];
-            character.LastName  = string.Empty;
+            character.LastName = string.Empty;
             character.WorldName = Service.PlayerState.HomeWorld.Value.Name.ToString();
         }
         else
@@ -362,9 +362,6 @@ public class CharData
 
         return true;
     }
-
-    private static bool IsValidNameFirstChar(char c)
-        => char.IsLetter(c) && char.IsUpper(c);
 
     public void FetchClipboardCharacter()
     {
@@ -420,6 +417,9 @@ public class CharData
         this.IsDataReady = false;
         this.LoadedMetric = null;
     }
+
+    private static bool IsValidNameFirstChar(char c)
+        => char.IsLetter(c) && char.IsUpper(c);
 
     private void SetJobId()
     {
