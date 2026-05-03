@@ -286,7 +286,7 @@ public class MenuBar
                     var historyEntry = history[i];
                     if (ImGui.Selectable($"##PartyListSel{i}", false, ImGuiSelectableFlags.SpanAllColumns, new Vector2(0, 25 * ImGuiHelpers.GlobalScale)))
                     {
-                        Service.CharDataManager.DisplayedChar.FetchCharacter($"{historyEntry.FirstName} {historyEntry.LastName}@{historyEntry.WorldName}");
+                        Service.CharDataManager.DisplayedChar.FetchCharacter($"{historyEntry.FullName}@{historyEntry.WorldName}");
                         ImGui.CloseCurrentPopup();
                     }
 
@@ -296,7 +296,7 @@ public class MenuBar
 
                     ImGui.TableNextColumn();
 
-                    ImGui.Text($"{historyEntry.FirstName} {historyEntry.LastName}");
+                    ImGui.Text(historyEntry.FullName);
 
                     ImGui.TableNextColumn();
 

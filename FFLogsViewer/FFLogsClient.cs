@@ -253,7 +253,7 @@ public class FFLogsClient
     {
         var query = new StringBuilder();
         query.Append(
-            $"{{\"query\":\"query {{characterData{{character(name: \\\"{charData.FirstName} {charData.LastName}\\\"serverSlug: \\\"{charData.WorldName}\\\"serverRegion: \\\"{charData.RegionName}\\\"){{");
+            $"{{\"query\":\"query {{characterData{{character(name: \\\"{charData.FullName}\\\"serverSlug: \\\"{charData.WorldName}\\\"serverRegion: \\\"{charData.RegionName}\\\"){{");
         query.Append("hidden ");
 
         var metric = Service.MainWindow.GetCurrentMetric();

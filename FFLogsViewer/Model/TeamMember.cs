@@ -11,4 +11,8 @@ public class TeamMember
     /// Null if in the local player party.
     /// </summary>
     public uint? AllianceIndex;
+
+    public string FullName => this.LastName != string.Empty
+        ? $"{this.FirstName} {this.LastName}"
+        : this.FirstName;
 }
