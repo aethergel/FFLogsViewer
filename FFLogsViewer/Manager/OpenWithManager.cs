@@ -249,8 +249,9 @@ public unsafe class OpenWithManager
             {
                 var hasFailed = data->LastPatchHotfixTimestamp == 0; // previously 92/0x5C was checked, but that's not documented in CS yet. this works as a replacement.
                 var isPrivate = data->JoinConditionFlags.HasFlag(AgentLookingForGroup.JoinCondition.Private);
-                var isJoining = this.isJoiningPartyFinderOffset != 0 && *(byte*)(agent + this.isJoiningPartyFinderOffset) != 0;
+                var isJoining = false; // this.isJoiningPartyFinderOffset != 0 && *(byte*)(agent + this.isJoiningPartyFinderOffset) != 0;
 
+                // isJoining value is not correct anymore, unsure where is the replacement, should fix one day to avoid the opening and instant closing, but whatever.
                 if (!hasFailed && !isPrivate && !isJoining)
                 {
                     var fullName = data->LeaderString;
