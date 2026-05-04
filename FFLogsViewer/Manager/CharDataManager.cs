@@ -42,7 +42,7 @@ public class CharDataManager
 
         if (!Service.Configuration.Style.IsLocalPlayerInPartyView && !this.IsCurrPartyAnAlliance)
         {
-            var index = currPartyMembers.FindIndex(member => member.FullName == localPLayer?.CharacterName
+            var index = currPartyMembers.FindIndex(member => member.FullName == localPLayer.CharacterName
                                                               && member.World == localPLayer.HomeWorld.ValueNullable?.Name);
             if (index >= 0)
             {
