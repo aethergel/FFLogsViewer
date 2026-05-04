@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FFLogsViewer.Model;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using FFXIVClientStructs.FFXIV.Client.System.Framework;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using Lumina.Excel.Sheets;
 
 namespace FFLogsViewer.Manager;
@@ -108,7 +108,7 @@ public class CharDataManager
     {
         try
         {
-            var placeholder = Framework.Instance()->GetUIModule()->GetPronounModule()->ResolvePlaceholder(text, 0, 0);
+            var placeholder = PronounModule.Instance()->ResolvePlaceholder(text, 0, 0);
             if (placeholder != null && placeholder->IsCharacter())
             {
                 var character = (Character*)placeholder;
