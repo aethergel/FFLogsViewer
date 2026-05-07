@@ -12,5 +12,5 @@
   "Tags": [
     "FFLogs"
   ],
-    "Changelog": "-2.5.1.0\n    Add support for CN client. Thank you to Nukoooo for the changes and for having supported it since 2022.\n-2.5.0.1\n    Update for 7.5 patch."
+    "Changelog": "-2.5.1.1\n    Fix clipboard search not working due to Dalamud-related changes.\n-2.5.1.0\n    Add support for CN client. Thank you to Nukoooo for the changes and for having supported it since 2022.\n-2.5.0.1\n    Update for 7.5 patch."
 }
