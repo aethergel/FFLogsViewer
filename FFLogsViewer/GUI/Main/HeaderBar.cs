@@ -45,14 +45,18 @@ public class HeaderBar
             this.ResetSizeCount--;
         }
 
-        var calcInputSize = Util.Round((contentRegionAvailWidth - (ImGui.GetStyle().ItemSpacing.X * 2) - buttonsWidth) / 3);
+        var nbOfInputs = Util.IsGlobalVersion() ? 3 : 2;
+        var calcInputSize = Util.Round((contentRegionAvailWidth - (ImGui.GetStyle().ItemSpacing.X * 2) - buttonsWidth) / nbOfInputs);
 
         ImGui.SetNextItemWidth(calcInputSize);
-        ImGui.InputTextWithHint("##FirstName", "First Name", ref Service.CharDataManager.DisplayedChar.FirstName, 15, ImGuiInputTextFlags.CharsNoBlank);
+        ImGui.InputTextWithHint("##FirstName", $"{(Util.IsGlobalVersion() ? "First " : string.Empty)}Name", ref Service.CharDataManager.DisplayedChar.FirstName, 15, ImGuiInputTextFlags.CharsNoBlank);
 
-        ImGui.SameLine();
-        ImGui.SetNextItemWidth(calcInputSize);
-        ImGui.InputTextWithHint("##LastName", "Last Name", ref Service.CharDataManager.DisplayedChar.LastName, 15, ImGuiInputTextFlags.CharsNoBlank);
+        if (Util.IsGlobalVersion())
+        {
+            ImGui.SameLine();
+            ImGui.SetNextItemWidth(calcInputSize);
+            ImGui.InputTextWithHint("##LastName", "Last Name", ref Service.CharDataManager.DisplayedChar.LastName, 15, ImGuiInputTextFlags.CharsNoBlank);
+        }
 
         ImGui.SameLine();
         ImGui.SetNextItemWidth(calcInputSize);
