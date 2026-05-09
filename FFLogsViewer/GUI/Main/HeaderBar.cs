@@ -17,6 +17,8 @@ public class HeaderBar
 
     private readonly Stopwatch partyListStopwatch = new();
 
+    private static int NbOfInputs => Util.IsGlobalVersion() ? 3 : 2;
+
     public void Draw()
     {
         using var style = ImRaii.PushStyle(
@@ -45,8 +47,7 @@ public class HeaderBar
             this.ResetSizeCount--;
         }
 
-        var nbOfInputs = Util.IsGlobalVersion() ? 3 : 2;
-        var calcInputSize = Util.Round((contentRegionAvailWidth - (ImGui.GetStyle().ItemSpacing.X * 2) - buttonsWidth) / nbOfInputs);
+        var calcInputSize = Util.Round((contentRegionAvailWidth - (ImGui.GetStyle().ItemSpacing.X * 2) - buttonsWidth) / NbOfInputs);
 
         ImGui.SetNextItemWidth(calcInputSize);
         ImGui.InputTextWithHint("##FirstName", $"{(Util.IsGlobalVersion() ? "First " : string.Empty)}Name", ref Service.CharDataManager.DisplayedChar.FirstName, 15, ImGuiInputTextFlags.CharsNoBlank);
@@ -188,7 +189,7 @@ public class HeaderBar
 
     private static float GetMinWindowSize()
     {
-        return Util.Round(((GetMinInputWidth() + (ImGui.GetStyle().ItemSpacing.X * 2)) * 3) + GetButtonsWidth());
+        return Util.Round(((GetMinInputWidth() + (ImGui.GetStyle().ItemSpacing.X * 2)) * NbOfInputs) + GetButtonsWidth());
     }
 
     private void DrawPartyMembersPopup()
