@@ -362,11 +362,6 @@ public class CharData
         try
         {
             clipboardRawText = ImGui.GetClipboardText();
-            if (clipboardRawText == null)
-            {
-                this.CharError = CharacterError.ClipboardError;
-                return;
-            }
         }
         catch
         {
