@@ -344,8 +344,7 @@ public class CharData
             }
         }
 
-        if (!IsValidNameFirstChar(character.FirstName[0])
-            || (Util.IsGlobalVersion() && !IsValidNameFirstChar(character.LastName[0])))
+        if (Util.IsGlobalVersion() && !IsValidNameFirstChar(character.FirstName[0]) && !IsValidNameFirstChar(character.LastName[0]))
         {
             return false;
         }
