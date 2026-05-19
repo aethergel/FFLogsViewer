@@ -12,6 +12,7 @@ public sealed class FFLogsViewer : IDalamudPlugin
 {
     private readonly WindowSystem windowSystem;
     private readonly FFLogsViewerProvider ffLogsViewerProvider;
+    private readonly ChatTwoIpc chatTwoIpc;
 
     public FFLogsViewer(IDalamudPluginInterface pluginInterface)
     {
@@ -37,6 +38,8 @@ public sealed class FFLogsViewer : IDalamudPlugin
         ContextMenu.Enable();
 
         this.ffLogsViewerProvider = new FFLogsViewerProvider(pluginInterface, new FFLogsViewerAPI());
+        this.chatTwoIpc = new ChatTwoIpc(pluginInterface);
+        this.chatTwoIpc.Enable();
 
         Service.Interface.UiBuilder.OpenMainUi += OpenMainUi;
         Service.Interface.UiBuilder.OpenConfigUi += OpenConfigUi;
@@ -50,6 +53,8 @@ public sealed class FFLogsViewer : IDalamudPlugin
         Service.OpenWithManager.Dispose();
 
         ContextMenu.Disable();
+
+        this.chatTwoIpc.Disable();
 
         Service.Interface.UiBuilder.OpenMainUi -= OpenMainUi;
         Service.Interface.UiBuilder.OpenConfigUi -= OpenConfigUi;

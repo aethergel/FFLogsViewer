@@ -1,5 +1,4 @@
 ﻿using Dalamud.Game.Gui.ContextMenu;
-using Dalamud.Memory;
 using Dalamud.Utility;
 using FFLogsViewer.Manager;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -16,6 +15,29 @@ public class ContextMenu
     public static void Disable()
     {
         Service.ContextMenu.OnMenuOpened -= OnOpenContextMenu;
+    }
+
+    public static void SearchPlayer(string playerName, string? addonName = null)
+    {
+        if (Service.Configuration is { OpenInBrowser: true, ContextMenuStreamer: false })
+        {
+            CharDataManager.OpenCharInBrowser(playerName);
+        }
+        else
+        {
+            Service.MainWindow.Open();
+            if (Service.Configuration.ContextMenuAlwaysPartyView
+                || (Service.Configuration.ContextMenuPartyView && IsPartyAddon(addonName)))
+            {
+                Service.MainWindow.IsPartyView = true;
+                Service.CharDataManager.UpdatePartyMembers();
+                Service.CharDataManager.DisplayedChar.ParseTextForChar(playerName);
+            }
+            else
+            {
+                Service.CharDataManager.DisplayedChar.FetchCharacter(playerName);
+            }
+        }
     }
 
     private static bool IsMenuValid(IMenuArgs menuOpenedArgs)
@@ -78,25 +100,7 @@ public class ContextMenu
             playerName = $"{menuTargetDefault.TargetName}@{world.Name}";
         }
 
-        if (Service.Configuration is { OpenInBrowser: true, ContextMenuStreamer: false })
-        {
-            CharDataManager.OpenCharInBrowser(playerName);
-        }
-        else
-        {
-            Service.MainWindow.Open();
-            if (Service.Configuration.ContextMenuAlwaysPartyView
-                || (Service.Configuration.ContextMenuPartyView && IsPartyAddon(menuArgs.AddonName)))
-            {
-                Service.MainWindow.IsPartyView = true;
-                Service.CharDataManager.UpdatePartyMembers();
-                Service.CharDataManager.DisplayedChar.ParseTextForChar(playerName);
-            }
-            else
-            {
-                Service.CharDataManager.DisplayedChar.FetchCharacter(playerName);
-            }
-        }
+        SearchPlayer(playerName, menuArgs.AddonName);
     }
 
     private static void OnOpenContextMenu(IMenuOpenedArgs menuOpenedArgs)
