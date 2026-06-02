@@ -110,6 +110,7 @@ public class Configuration : IPluginConfiguration
             new LayoutEntry { Type = LayoutEntryType.Encounter, Expansion = "Dawntrail", Zone = "Ultimates (Legacy)", ZoneId = 59, Encounter = "Dragonsong's Reprise", EncounterId = 1076, Difficulty = "Normal", DifficultyId = 100, Alias = "DSR", SwapId = "DT ult", SwapNumber = 0 },
             new LayoutEntry { Type = LayoutEntryType.Encounter, Expansion = "Dawntrail", Zone = "Ultimates (Legacy)", ZoneId = 59, Encounter = "The Omega Protocol", EncounterId = 1077, Difficulty = "Normal", DifficultyId = 100, Alias = "TOP", SwapId = "DT ult", SwapNumber = 0 },
             new LayoutEntry { Type = LayoutEntryType.Encounter, Expansion = "Dawntrail", Zone = "Futures Rewritten", ZoneId = 65, Encounter = "Futures Rewritten", EncounterId = 1079, Difficulty = "Normal", DifficultyId = 100, Alias = "FRU", SwapId = "DT ult", SwapNumber = 0 },
+            new LayoutEntry { Type = LayoutEntryType.Encounter, Expansion = "Dawntrail", Zone = "Dancing Mad", ZoneId = 76, Encounter = "Dancing Mad", EncounterId = 1085, Difficulty = "Normal", DifficultyId = 100, Alias = "DMU/UMAD", SwapId = "DT ult", SwapNumber = 0 },
             new LayoutEntry { Type = LayoutEntryType.Header, Alias = "Ultimates (EW)", Expansion = "-", Zone = "-", Encounter = "-", Difficulty = "-", SwapId = "DT ult", SwapNumber = 1 },
             new LayoutEntry { Type = LayoutEntryType.Encounter, Expansion = "Endwalker", Zone = "Ultimates (Legacy)", ZoneId = 43, Encounter = "The Unending Coil of Bahamut", EncounterId = 1060, Difficulty = "Normal", DifficultyId = 100, Alias = "UCoB", SwapId = "DT ult", SwapNumber = 1 },
             new LayoutEntry { Type = LayoutEntryType.Encounter, Expansion = "Endwalker", Zone = "Ultimates (Legacy)", ZoneId = 43, Encounter = "The Weapon's Refrain", EncounterId = 1061, Difficulty = "Normal", DifficultyId = 100, Alias = "UwU", SwapId = "DT ult", SwapNumber = 1 },
@@ -123,9 +124,7 @@ public class Configuration : IPluginConfiguration
             new LayoutEntry { Type = LayoutEntryType.Encounter, Expansion = "Dawntrail", Zone = "Trials III (Extreme)", ZoneId = 72, Encounter = "Doomtrain", EncounterId = 1083, Difficulty = "Normal", DifficultyId = 100 },
             new LayoutEntry { Type = LayoutEntryType.Encounter, Expansion = "Dawntrail", Zone = "Trials III (Extreme)", ZoneId = 72, Encounter = "Enuo", EncounterId = 1084, Difficulty = "Normal", DifficultyId = 100 },
             new LayoutEntry { Type = LayoutEntryType.Header, Alias = "Others", Expansion = "-", Zone = "-", Encounter = "-", Difficulty = "-" },
-            new LayoutEntry { Type = LayoutEntryType.Encounter, Expansion = "Dawntrail", Zone = "Alliance Raids (Chaotic)", ZoneId = 66, Encounter = "Cloud of Darkness", EncounterId = 2061, Alias = "CoD (Chaotic)", Difficulty = "Normal", DifficultyId = 100 },
             new LayoutEntry { Type = LayoutEntryType.Encounter, Expansion = "Dawntrail", Zone = "Trials (Unreal)", ZoneId = 64, Encounter = "Shinryu", EncounterId = 3013, Alias = "Shinryu (Unreal)", Difficulty = "Normal", DifficultyId = 100 },
-            new LayoutEntry { Type = LayoutEntryType.Encounter, Expansion = "Dawntrail", Zone = "Deep Dungeons", ZoneId = 71, Encounter = "Eminent Grief", EncounterId = 4548, Alias = "Quantum (40)", Difficulty = "Savage", DifficultyId = 101 },
         ];
     }
 
